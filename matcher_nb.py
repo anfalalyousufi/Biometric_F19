@@ -4,9 +4,7 @@ import numpy as np
 def m_Np(X, y):
 
     nb = GaussianNB() 
-    num_correct = 0
     gen_scores = []
-    num_incorrect = 0
     imp_scores = []
     
     for i in range(0, len(y)):
@@ -23,20 +21,12 @@ def m_Np(X, y):
         y_hat[template_labels != query_label] = 0
         
         nb.fit(template_imgs, y_hat) # Train the classifier
-        y_pred = nb.predict(query_img.reshape(1,-1)) # Predict the label of the query
+        scores = nb.predict_proba(query_img.reshape(1,-1)).reshape(1,2) # Predict the label of the query
+        classes = nb.classes_.reshape(1,2)
         
-        # Print results
-        if y_pred == 1:
-            num_correct += 1
-            gen_scores.append(query_label)
-        else:
-            num_incorrect += 1
-            imp_scores.append(query_label)
-            
+        gen_scores.extend(scores[classes==1])
+        imp_scores.extend(scores[classes==0])
+        
     return gen_scores, imp_scores
-    # Print results
-    #print()
-    #print("Num correct = %d, Num incorrect = %d, Accuracy = %0.2f" 
-          #% (num_correct, num_incorrect, num_correct/(num_correct+num_incorrect)))    
     
     

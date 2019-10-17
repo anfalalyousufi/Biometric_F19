@@ -1,23 +1,72 @@
-import os 
+import dlib
 import numpy as np
+import math
 
-def get_landmarks(landmark_directory):
-    X = []
-    y = []
+def distances(points):
+    dist = []
+    for i in range(points.shape[0]):
+        for j in range(points.shape[0]):
+            p1 = points[i,:]
+            p2 = points[j,:]      
+            dist.append( math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2) )
+    return dist
+
+def get_bounding_box(rect):
+	# take a bounding predicted by dlib and convert it
+	# to the format (x, y, w, h) 
+	x = rect.left()
+	y = rect.top()
+	w = rect.right() - x
+	h = rect.bottom() - y 
+	return x, y, w, h
+
+def shape_to_np(shape, num_coords, dtype="int"):
+	# initialize the list of (x, y)-coordinates
+	coords = np.zeros((num_coords, 2), dtype=dtype)
+ 	# loop over the facial landmarks and convert them
+	# to a 2-tuple of (x, y)-coordinates
+	for i in range(0, num_coords):
+		coords[i] = (shape.part(i).x, shape.part(i).y) 
+	# return the list of (x, y)-coordinates
+	return coords
+
+def get_landmarks(images, labels, num_coords):
     
-    subfolders = os.listdir(landmark_directory)
-    for subfolder in subfolders:
-        print("Loading landmarks in %s" % subfolder)
-        if os.path.isdir(os.path.join(landmark_directory, subfolder)): # only load directories
-            subfolder_files = os.listdir(
-                    os.path.join(landmark_directory, subfolder)
-                    )
-            for file in subfolder_files:
-                if file.endswith('5.npy'): 
-                    landmarks = np.load(os.path.join(landmark_directory, subfolder, file))
-                    X.append(landmarks)
-                    y.append(subfolder)
+    #print("Getting %d facial landmarks" % num_coords)
+    landmarks = []
+    new_labels = []
+    img_ct = 0
     
-    print("All landmarks are loaded")     
-    # return the images and their labels      
-    return np.array(X), np.array(y)
+    if num_coords == 5:
+        predictor_path = 'shape_predictor_5_face_landmarks.dat'
+    else:
+        predictor_path = 'shape_predictor_68_face_landmarks.dat'
+
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor(predictor_path)
+
+    for img, label in zip(images, labels):
+        # Ask the detector to find the bounding boxes of each face. The 1 in the
+        # second argument indicates that we should upsample the image 1 time. This
+        # will make everything bigger and allow us to detect more faces.
+        img_ct += 1
+        detected_faces = detector(img, 1)
+        for d in detected_faces:
+            new_labels.append(label)
+            x, y, w, h  = get_bounding_box(d) 
+            # Get the landmarks/parts for the face in box d.
+            points = shape_to_np(
+                    predictor(img, d), 
+                    num_coords) 
+                        
+            dist = distances(points)                   
+            landmarks.append(dist)    
+            
+      
+            #if img_ct % 10 == 0:
+            #    print("%d images with facial landmarks completed." % img_ct)
+                
+    return np.array(landmarks), np.array(new_labels)
+            
+            
+        

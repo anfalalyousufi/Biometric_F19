@@ -6,21 +6,22 @@ import matcher_knn
 import performance
 import get_data
 
-feature = 1
+
+feature = 2
 matcher = 2
 
 ''' Load the data and their labels '''
 image_directory = 'Project Data'
-landmark_directory = 'Project Data/landmarks'
+landmark_directory = 'Project Data/Landmarks'
 X, y = get_data.get_images(image_directory)
-
 
 if feature == 1:
     X = features_pca.pca(X)
 elif feature == 2:
-    X, y = features_landmarks.get_landmarks(landmark_directory)
+    #X, y = features_landmarks.get_landmarks(landmark_directory)
+    X, y = features_landmarks.get_landmarks(X, y, 5)
 elif feature == 3:
-    X = features_lbp.lbpfeature(X)
+    X = features_lbp.featuresLBP(X)
     
 if matcher == 1:
     gen_scores, imp_scores = matcher_nb.m_Np(X, y)
@@ -29,4 +30,3 @@ elif matcher == 2:
 
 ''' Performance assessment '''
 performance.perf(gen_scores, imp_scores)
-

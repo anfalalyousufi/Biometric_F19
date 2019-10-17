@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
+#import matplotlib.pyplot as plt
 
 def get_lbp(image, width):
     image = image.reshape((width, width))
@@ -36,24 +36,22 @@ def get_features(image, size):
     return histograms
 
 #########################################################################
-def lbpfeature(X):
-    width = 64
+def featuresLBP (X):
+    
+    width = 50
     faces = X
     blockSize = 16
-    #print("Dataset consists of %d faces" % n_samples)
-    
+
     features = []
     for i in range(len(faces)):
         lbp_face = get_lbp(faces[i], width)
         lbp_features = get_features(lbp_face, blockSize)
         features.append(lbp_features)
         
-        if i <= 5: # Show first 5 images
-            plt.figure()
-            plt.imshow(faces[i].reshape((width,width)), cmap='gray')
-            plt.figure()
-            plt.imshow(lbp_face, cmap='gray')
-            
+        #if i <= 5: # Show first 5 images
+        #    plt.figure()
+        #    plt.imshow(faces[i].reshape((width,width)), cmap='gray')
+        #    plt.figure()
+        #    plt.imshow(lbp_face, cmap='gray')     
     features = np.array(features)
-    
     return features
