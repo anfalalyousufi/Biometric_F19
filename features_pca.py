@@ -1,10 +1,4 @@
 import numpy as np
-import get_images
-
-image_directory = '/Users/meghna/Desktop/Project 1/Project Data'
-
-X, y = get_images.get_images(image_directory)
-
 
 def pca(X):
     
