@@ -1,18 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Oct 16 16:32:44 2019
-
-@author: meghna
-"""
-
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 
-#image_directory = '/Users/meghna/Desktop/Project 1/Project Data'
-#X, y = get_images.get_images(image_directory)
-
 def RF(X, y):
+    #random forest with 10 trees and maximum depth of tree is set to 25. 
+    #We choose to specify a depth to avoid trees from getting too big and thus overfitting
     randomFor = RandomForestClassifier(n_estimators=10, max_depth=25, random_state=4) 
     gen_scores = []
     imp_scores = []
